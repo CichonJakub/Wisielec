@@ -8,9 +8,18 @@ bufferSize          = 1024
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
-
+for i in range(5):
+        msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+        msg = msgFromServer[0].decode()
+        print(msg)
 
 while(True):
-    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-    msg = msgFromServer[0]
-    print(msg)
+    
+    msg = input()
+    bytesToSend = str.encode(msg)
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+
+    for i in range(2):
+        msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+        msg = msgFromServer[0].decode()
+        print(msg)

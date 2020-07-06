@@ -3,71 +3,120 @@ import random
 import time
 from settings import *
 
-sourceIP = "127.0.0.1"
-sourcePort = 8080
-bufferSize = 1024
+class Server:
+
+    def __init__(self):
+        self.sourceIP = "127.0.0.1"
+        self.sourcePort = 8080
+        self.serverAddress = (self.sourceIP, self.sourcePort)
+        self.bufferSize = 1024
+
+        #create UDP socket
+        self.serverSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 
+    def binding(self, serverAddress):
+        #socket.bind((sourceIP, sourcePort))
+        try:
+            self.serverSocket.bind(serverAddress)
+            print("I am listening :)")
+        except:
+            print("Bind error!")
 
-#create UDP socket
-socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+    def play(self):
 
-#bind 
-socket.bind((sourceIP, sourcePort))
+        while(True):
+            try:
+                game = True
+                print("LOOP")
+                bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
+                message = bytesAddressPair[0]
+                self.cliAddress = bytesAddressPair[1]
 
-print("I am listening :)")
+                category, word = random.choice(list(wordBank.items()))
+                break
 
-
-while(True):
-    game = True
-    print("LOOP")
-    bytesAddressPair = socket.recvfrom(bufferSize)
-    message = bytesAddressPair[0]
-    address = bytesAddressPair[1]
-
-    category, word = random.choice(list(wordBank.items()))
-
-    while(game):
-        
-        lives = 5
-
-        clientMSG = "Message from Client: {}".format(message)
-        clientIP = "Client IP Address:{}".format(address)
-
-        print(clientMSG)
-        print(clientIP)
-        print(category)
-        print(word)
-
-        secret_word = ''
-        
-        #zamienienie liter na '_ '
-        for letter in word:
-            secret_word += '_ '
-
-        msg = "WELCOME TO 'THE HANGMAN' GAME"
-        bytesToSend = str.encode(msg)
-        socket.sendto(bytesToSend, address)
-        time.sleep(1)
-
-        msg = "Phrase from category: {}".format(category)
-        bytesToSend = str.encode(msg)
-        socket.sendto(bytesToSend, address)
-        time.sleep(1)
-
-        msg = "Guess letter or entire phrase if You can ;)"
-        bytesToSend = str.encode(msg)
-        socket.sendto(bytesToSend, address)
-        time.sleep(1)
+            except:
+                print("Error when receiving message")
 
         while(game):
-            msg = "You have got {} lives, dont give up!".format(str(lives))
-            bytesToSend = str.encode(msg)
-            socket.sendto(bytesToSend, address)
+            
+            lives = 5
+
+            clientMSG = "Message from Client: {}".format(message)
+            clientIP = "Client IP Address:{}".format(self.cliAddress)
+
+            print(clientMSG)
+            print(clientIP)
+            print(category)
+            print(word)
+
+            self.secretWord = ''
+            
+            #zamienienie liter na '_ '
+            for letter in word:
+                self.secretWord += '_ '
+
+            self.response( "WELCOME TO 'THE HANGMAN' GAME" )
             time.sleep(1)
 
-            bytesToSend = str.encode(secret_word)
-            socket.sendto(bytesToSend, address)
+            self.response( "Phrase from category: {}".format(category) )
             time.sleep(1)
 
-            game = False
+            self.response( "Guess letter or entire phrase if You can ;)" )
+            time.sleep(1)
+
+            self.response( "You have got {} lives".format(lives) )
+
+            self.response( self.secretWord )
+            time.sleep(1)
+
+            while(lives > 1):
+                # receiving letter from client
+                isCorrect = False
+
+                msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
+                guess = msgFromClient[0].decode()
+                print(guess)
+
+                for loc, letter in enumerate(word):
+                    if guess == letter:
+                        isCorrect = True
+                        self.secretWord = self.secretWord[:loc*2] + guess + self.secretWord[loc*2+1:]
+
+                # recv
+                print(lives)
+                if isCorrect:
+                    self.response( "Congrats, You guessed it !" )
+                    self.response(self.secretWord)
+                else:
+                    # rozpatrzec czy przyslano slowo czy literke bo odejmujemy 1 lub wiecej
+                    lives -= 1
+                    self.response( "You have got {} lives, dont give up!".format(str(lives)) )
+                    self.response(self.secretWord)
+
+                if '_' not in self.secretWord:
+                    self.response( "You guessed the phrase {} correctly, congratulations ! You won !".format(word) )
+                    time.sleep(1)
+                    game = False
+                    break
+            
+            if lives < 1:
+                self.response( "Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word) )
+                time.sleep(1)
+                game = False
+            
+            # mozna tu jeszcze dopisac opcje wybrania kolejnej gry lub wylaczenie ale to wiecej rzeczy bedzie do spradzania, wykonalne owszem, czy potrzebne nie wiem :/
+
+    def response(self, msg):
+        #msg = "You have got {} lives, dont give up!".format(str(lives))
+        bytesToSend = str.encode(msg)
+        self.serverSocket.sendto(bytesToSend, self.cliAddress)
+        time.sleep(1)
+
+try:
+    server = Server()
+    server.binding(server.serverAddress)
+    server.play()
+except:
+    print("sth goes wrong :/")
