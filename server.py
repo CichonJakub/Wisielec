@@ -12,7 +12,7 @@ class Server:
         self.bufferSize = 1024
 
         #create UDP socket
-        self.serverSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.serverSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
 
 
     def binding(self, serverAddress):
