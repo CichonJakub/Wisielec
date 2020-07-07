@@ -1,7 +1,7 @@
-jak zgadujemy znowu ta sama literke to musi byc blad
-    lista liter byly zgadywane
+jak zgadujemy znowu ta sama literke to musi byc blad    DONE
+    lista liter byly zgadywane                          DONE
 
-zgadywanie calego hasla
+zgadywanie calego hasla     DONE
 
 adresy multicast do wyszukiwania serwera jak nie podamy ip serwera,
 

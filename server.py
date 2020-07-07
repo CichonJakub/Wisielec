@@ -34,6 +34,8 @@ class Server:
                 self.cliAddress = bytesAddressPair[1]
 
                 category, word = random.choice(list(wordBank.items()))
+                guessed_letters = []
+                is_guessed = False
                 break
 
             except:
@@ -79,18 +81,25 @@ class Server:
                 guess = msgFromClient[0].decode()
                 print(guess)
 
-                for loc, letter in enumerate(word):
-                    if guess == letter:
-                        isCorrect = True
-                        self.secretWord = self.secretWord[:loc*2] + guess + self.secretWord[loc*2+1:]
+                if guess not in guessed_letters and len(guess) == 1:
+                    for loc, letter in enumerate(word):
+                        if guess == letter:
+                            isCorrect = True
+                            self.secretWord = self.secretWord[:loc*2] + guess + self.secretWord[loc*2+1:]
+                    guessed_letters.append(guess)
+
+                if len(guess) == len(word):
+                    if guess == word:
+                        self.secretWord = word
+                        is_guessed = True
 
                 # recv
                 print(lives)
-                if isCorrect:
+                if isCorrect and not is_guessed:
                     self.response( "Congrats, You guessed it !" )
                     self.response(self.secretWord)
-                else:
-                    # rozpatrzec czy przyslano slowo czy literke bo odejmujemy 1 lub wiecej
+
+                if not isCorrect and not is_guessed:
                     lives -= 1
                     self.response( "You have got {} lives, dont give up!".format(str(lives)) )
                     self.response(self.secretWord)
@@ -109,7 +118,6 @@ class Server:
             # mozna tu jeszcze dopisac opcje wybrania kolejnej gry lub wylaczenie ale to wiecej rzeczy bedzie do spradzania, wykonalne owszem, czy potrzebne nie wiem :/
 
     def response(self, msg):
-        #msg = "You have got {} lives, dont give up!".format(str(lives))
         bytesToSend = str.encode(msg)
         self.serverSocket.sendto(bytesToSend, self.cliAddress)
         time.sleep(1)
