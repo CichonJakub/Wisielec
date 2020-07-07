@@ -3,8 +3,8 @@ import socket
 
 
 # argument 0 to jest nazawa pliku jaki odpalamy, uwaga: dane zaczynaja sie od argv[1]
-if len(sys.argv) != 1:
-    serverAddressPort = (str(sys.argv), int(sys.argv))
+if len(sys.argv) == 3:
+    serverAddressPort = (str(sys.argv[1]), int(sys.argv[2]))
 else:
     # MCAST_GRP = '224.1.1.1'
     # MCAST_PORT = 5007
