@@ -1,0 +1,13 @@
+jak zgadujemy znowu ta sama literke to musi byc blad
+    lista liter byly zgadywane
+
+zgadywanie calego hasla
+
+adresy multicast do wyszukiwania serwera jak nie podamy ip serwera,
+
+przerowbic to tak zeby z lini komend podawac argumnety
+    pyhton multicast - serwer do jakijs grupy m castowej i ona ma zczytywac
+
+TLV - jak konczymy gre - leci wiadomosc z jakas flaga ze end :D
+
+demon logujacy eventy
