@@ -3,23 +3,28 @@ import random
 import time
 import sys
 import os
+import syslog
 from settings import *
 
 class Server:
 
-    #try:
-        #syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL7)
+    try:
+        syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL7)
+    except:
+        print("could not handle syslog")
+
     try:
         pid = os.fork()
         if pid > 0:
             # exit first parent
+            #syslog.syslog("exited first parent")
             print("exited first parent")
             sys.exit(0)
     except OSError as e:
+        #syslog.syslog("fork #1 failed: %d (%s)" % (e.errno, e.strerror))
         print >>sys.stderr, "fork #1 failed: %d (%s)" % (e.errno, e.strerror)
         sys.exit(1)
-    #except:
-    #    print("could not handle syslog")
+    
 
     home_dir = '.'
     os.chdir(home_dir)
@@ -30,10 +35,13 @@ class Server:
         pid = os.fork()
         if pid > 0:
             # exit second parent
+            #syslog.syslog("exited second parent")
+            #syslog.syslog("Daemon PID %d" % pid)
             print("exited second")
             print("Daemon PID %d" % pid)
             sys.exit(0)
     except OSError as e:
+        #syslog.syslog("fork #2 failed: %d (%s)" % (e.errno, e.strerror))
         print >>sys.stderr, "fork #2 failed: %d (%s)" % (e.errno, e.strerror)
         sys.exit(1)
 
@@ -53,8 +61,10 @@ class Server:
         #socket.bind((sourceIP, sourcePort))
         try:
             self.serverSocket.bind(serverAddress)
+            #syslog.syslog("I am listening :)")
             print("I am listening :)")
         except:
+            #syslog.syslog("Bind error!")
             print("Bind error!")
 
     def play(self):
@@ -62,6 +72,7 @@ class Server:
         while(True):
             try:
                 game = True
+                #syslog.syslog("LOOP")
                 print("LOOP")
                 bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
                 message = bytesAddressPair[0]
@@ -73,6 +84,7 @@ class Server:
                 break
 
             except:
+            	#syslog.syslog("Error when receiving message")
                 print("Error when receiving message")
 
         while(game):
@@ -81,6 +93,10 @@ class Server:
 
             clientMSG = "Message from Client: {}".format(message)
             clientIP = "Client IP Address:{}".format(self.cliAddress)
+            #syslog.syslog(clientMSG)
+            #syslog.syslog(clientIP)
+            #syslog.syslog(category)
+            #syslog.syslog(word)
 
             print(clientMSG)
             print(clientIP)
@@ -113,6 +129,7 @@ class Server:
 
                 msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
                 guess = msgFromClient[0].decode()
+                #syslog.syslog(guess)
                 print(guess)
 
                 if guess not in guessed_letters and len(guess) == 1:
@@ -128,6 +145,7 @@ class Server:
                         is_guessed = True
 
                 # recv
+                #syslog.syslog(lives)
                 print(lives)
                 if isCorrect and not is_guessed:
                     self.response( "Congrats, You guessed it !" )
