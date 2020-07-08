@@ -16,7 +16,6 @@ class Server:
 
 
     def binding(self, serverAddress):
-        #socket.bind((sourceIP, sourcePort))
         try:
             self.serverSocket.bind(serverAddress)
             print("I am listening :)")
@@ -104,7 +103,6 @@ class Server:
                     # proba nie zgadniecia litery ani calego slowa tylko jakies bzdury
                     lives -= 1
 
-                # recv
                 print(lives)
                 if isCorrect and not is_guessed:
                     self.response( "Congrats, You guessed it !" )
@@ -117,6 +115,7 @@ class Server:
 
                 if '_' not in self.secretWord:
                     self.response( "You guessed the phrase {} correctly, congratulations ! You won !".format(word) )
+                    self.response("")
                     time.sleep(1)
                     game = False
                     break
