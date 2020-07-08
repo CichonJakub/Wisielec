@@ -6,7 +6,7 @@ from settings import *
 class Server:
 
     def __init__(self):
-        self.sourceIP = "127.0.0.1"
+        self.sourceIP = "192.168.230.139"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -26,6 +26,8 @@ class Server:
     def play(self):
 
         while(True):
+
+
             try:
                 game = True
                 print("LOOP")
@@ -33,6 +35,7 @@ class Server:
                 message = bytesAddressPair[0]
                 self.cliAddress = bytesAddressPair[1]
 
+                print("siema")
                 category, word = random.choice(list(wordBank.items()))
                 guessed_letters = []
                 is_guessed = False
@@ -76,10 +79,12 @@ class Server:
             while(lives > 1):
                 # receiving letter from client
                 isCorrect = False
-
-                msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
-                guess = msgFromClient[0].decode()
-                print(guess)
+                while(True):
+                    msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
+                    if msgFromClient[1] == self.cliAddress:
+                        guess = msgFromClient[0].decode()
+                        print(guess)
+                        break
 
                 if guess not in guessed_letters and len(guess) == 1:
                     for loc, letter in enumerate(word):
@@ -88,10 +93,16 @@ class Server:
                             self.secretWord = self.secretWord[:loc*2] + guess + self.secretWord[loc*2+1:]
                     guessed_letters.append(guess)
 
-                if len(guess) == len(word):
+                elif len(guess) == len(word):
                     if guess == word:
                         self.secretWord = word
                         is_guessed = True
+                    else:
+                        lives -= 1
+
+                else:
+                    # proba nie zgadniecia litery ani calego slowa tylko jakies bzdury
+                    lives -= 1
 
                 # recv
                 print(lives)
