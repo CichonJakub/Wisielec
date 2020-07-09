@@ -16,6 +16,8 @@ if len(sys.argv) == 3:
 else:
     multicast_group = ('224.3.29.71', 10000)
 
+    
+
     UDPClientSocket2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_IP)
     print('1')
     UDPClientSocket2.settimeout(5)
@@ -23,6 +25,7 @@ else:
     ttl = struct.pack('b', 1)
     UDPClientSocket2.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
     print('1.75')
+    
 
     UDPClientSocket2.sendto(bytesToSend, multicast_group)
     print('2')
@@ -32,12 +35,20 @@ else:
     #serverAddressPort = ("127.0.0.2", 8080)
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
     print('hi')
-    infoFromServer = UDPClientSocket.recvfrom(bufferSize)
+    UDPClientSocket.bind(('192.168.230.139', 5008))
+    infoFromServer = UDPClientSocket2.recvfrom(bufferSize)
+    #infoFromServer = UDPClientSocket.recvfrom(bufferSize)
     print(infoFromServer[0])
+    serverAddressPort = infoFromServer[1]
+
+    unicastServerAddress = (serverAddressPort[0], 8080)
+    print(serverAddressPort)
+    UDPClientSocket.sendto(bytesToSend, unicastServerAddress)
     # UDPClientSocket.bind(('192.1.1.14', 5008))
+    print('sent')
 
 for i in range(5):
-    msgFromServer = UDPClientSocket2.recvfrom(bufferSize)
+    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
     msg = msgFromServer[0].decode()
     print(msg)
 
@@ -45,9 +56,9 @@ while (True):
 
     msg = input()
     bytesToSend = str.encode(msg)
-    UDPClientSocket2.sendto(bytesToSend, serverAddressPort)
+    UDPClientSocket.sendto(bytesToSend, unicastServerAddress)
 
     for i in range(2):
-        msgFromServer = UDPClientSocket2.recvfrom(bufferSize)
+        msgFromServer = UDPClientSocket.recvfrom(bufferSize)
         msg = msgFromServer[0].decode()
         print(msg)

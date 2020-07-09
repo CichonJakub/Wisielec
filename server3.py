@@ -8,7 +8,7 @@ import struct
 class Server:
 
     def __init__(self):
-        self.sourceIP = "127.0.0.2"
+        self.sourceIP = "192.168.230.139"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -56,7 +56,8 @@ class Server:
                 #connection = self.sourceIP + ':' + str(self.sourcePort)
                 #print(connection)
                 time.sleep(2)
-                self.response("Hello my friendo !")
+                #self.response("Hello my friendo !")
+                self.response2("Hello my friendo !", self.cliAddress)
                 print('wyslalem')
 
             except:
@@ -67,6 +68,7 @@ class Server:
                 print("LOOP")
                 bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
                 message = bytesAddressPair[0]
+                print(message)
                 self.cliAddress = bytesAddressPair[1]
                 category, word = random.choice(list(wordBank.items()))
                 guessed_letters = []
