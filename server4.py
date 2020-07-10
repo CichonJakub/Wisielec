@@ -3,6 +3,7 @@ import random
 import time
 from settings import *
 import struct
+import select
 
 
 class Server:
@@ -42,60 +43,60 @@ class Server:
     def play(self):
 
         while (True):
-            # 2 try do multicastu
-            try:
-                print('xD')
-                #bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
-                #print(bytesAddressPair[0])
-                bytesAddressPair2 = self.serverSocket2.recvfrom(self.bufferSize)
-                print('odebralem')
-                message2 = bytesAddressPair2[0]
-                self.cliAddress = bytesAddressPair2[1]
-                print(message2)
-                print(self.cliAddress)
-                #connection = self.sourceIP + ':' + str(self.sourcePort)
-                #print(connection)
-                time.sleep(2)
-                #self.response("Hello my friendo !")
-                self.response2("Hello my friendo !", self.cliAddress)
-                print('wyslalem')
+            
+            inputs = [ self.serverSocket, self.serverSocket2 ]
+            outputs = [ ]
 
-            except:
-                print('Error when recieving multicast message')
-
-            try:
-                game = True
-                print("LOOP")
-                bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
-                message = bytesAddressPair[0]
-                print(message)
-                self.cliAddress = bytesAddressPair[1]
-                category, word = random.choice(list(wordBank.items()))
-                guessed_letters = []
-                is_guessed = False
+            while True:
+                print('waiting...')
+                readable,_,_  = select.select(inputs, outputs, inputs)
+                print(readable)
                 break
+                
 
-            except:
-                print("Error when receiving message")
+            if self.serverSocket in readable:
+                try:   
+                    print('received unicast connection')
+                    bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)                        
+                    message = bytesAddressPair[0]
+                    print(message)
+                    self.cliAddress = bytesAddressPair[1]                   
+                except:
+                    print("Error when receiving message")
+
+            if self.serverSocket2 in readable:
+                try:
+                    print('received multicast connection')
+                    bytesAddressPair2 = self.serverSocket2.recvfrom(self.bufferSize)
+                    print('odebralem')
+                    self.cliAddress = bytesAddressPair2[1]
+                    time.sleep(2)
+                    self.response2("Hello my friendo !", self.cliAddress)
+                    #self.cliAddress = (self.cliAddress[0], 8080)
+                    print('wyslalem')                   
+                except:
+                    print('Error when recieving multicast message')
+            break
+
+        game = True
+        print("LOOP")
+        category, word = random.choice(list(wordBank.items()))
+        guessed_letters = []
+        is_guessed = False
+        lives = 5
+        clientIP = "Client IP Address:{}".format(self.cliAddress)
+        print(clientIP)
+        print(category)
+        print(word)
+
+        self.secretWord = ''
+
+        # zamienienie liter na '_ '
+        for letter in word:
+            self.secretWord += '_ '
 
         while (game):
-
-            lives = 5
-
-            clientMSG = "Message from Client: {}".format(message)
-            clientIP = "Client IP Address:{}".format(self.cliAddress)
-
-            print(clientMSG)
-            print(clientIP)
-            print(category)
-            print(word)
-
-            self.secretWord = ''
-
-            # zamienienie liter na '_ '
-            for letter in word:
-                self.secretWord += '_ '
-
+            
             self.response("WELCOME TO 'THE HANGMAN' GAME")
             time.sleep(1)
 
@@ -151,8 +152,6 @@ class Server:
                 self.response("Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word))
                 time.sleep(1)
                 game = False
-
-            # mozna tu jeszcze dopisac opcje wybrania kolejnej gry lub wylaczenie ale to wiecej rzeczy bedzie do spradzania, wykonalne owszem, czy potrzebne nie wiem :/
 
     def response(self, msg):
         bytesToSend = str.encode(msg)

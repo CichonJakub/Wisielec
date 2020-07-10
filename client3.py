@@ -30,24 +30,19 @@ else:
     UDPClientSocket2.sendto(bytesToSend, multicast_group)
     print('2')
     
-
-    # creating normal socket to have responeses on unicast
-    #serverAddressPort = ("127.0.0.2", 8080)
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
     print('hi')
-    #UDPClientSocket.bind(('192.168.230.139', 5008))
     infoFromServer = UDPClientSocket2.recvfrom(bufferSize)
-    #infoFromServer = UDPClientSocket.recvfrom(bufferSize)
     print(infoFromServer[0])
     serverAddressPort = infoFromServer[1]
 
-    unicastServerAddress = (serverAddressPort[0], 8080)
+    serverAddressPort = (serverAddressPort[0], 8080)
     print(serverAddressPort)
-    UDPClientSocket.sendto(bytesToSend, unicastServerAddress)
-    # UDPClientSocket.bind(('192.1.1.14', 5008))
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
     print('sent')
 
 for i in range(5):
+    print('wait')
     msgFromServer = UDPClientSocket.recvfrom(bufferSize)
     msg = msgFromServer[0].decode()
     print(msg)
@@ -56,7 +51,7 @@ while (True):
 
     msg = input()
     bytesToSend = str.encode(msg)
-    UDPClientSocket.sendto(bytesToSend, unicastServerAddress)
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
     for i in range(2):
         msgFromServer = UDPClientSocket.recvfrom(bufferSize)
