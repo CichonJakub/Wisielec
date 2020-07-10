@@ -102,61 +102,74 @@ class Server:
 
         while (game):
             
-            self.response("WELCOME TO 'THE HANGMAN' GAME")
+            self.response( "WELCOME TO 'THE HANGMAN' GAME" )
             time.sleep(1)
 
-            self.response("Phrase from category: {}".format(category))
+            self.response( "Phrase from category: {}".format(category) )
             time.sleep(1)
 
-            self.response("Guess letter or entire phrase if You can ;)")
+            self.response( "Guess letter or entire phrase if You can ;)" )
             time.sleep(1)
 
-            self.response("You have got {} lives".format(lives))
+            self.response( "You have got {} lives".format(lives) )
 
-            self.response(self.secretWord)
+            self.response( self.secretWord )
             time.sleep(1)
 
-            while (lives > 1):
+            while(lives >= 1):
                 # receiving letter from client
                 isCorrect = False
-
-                msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
-                guess = msgFromClient[0].decode()
-                print(guess)
+                while(True):
+                    msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
+                    if msgFromClient[1] == self.cliAddress:
+                        guess = msgFromClient[0].decode()
+                        print(guess)
+                        break
 
                 if guess not in guessed_letters and len(guess) == 1:
                     for loc, letter in enumerate(word):
                         if guess == letter:
                             isCorrect = True
-                            self.secretWord = self.secretWord[:loc * 2] + guess + self.secretWord[loc * 2 + 1:]
+                            self.secretWord = self.secretWord[:loc*2] + guess + self.secretWord[loc*2+1:]
                     guessed_letters.append(guess)
 
-                if len(guess) == len(word):
+                elif len(guess) == len(word):
                     if guess == word:
                         self.secretWord = word
+                        isCorrect = True
                         is_guessed = True
+                    else:
+                        lives -= 1
 
-                # recv
-                print(lives)
-                if isCorrect and not is_guessed:
-                    self.response("Congrats, You guessed it !")
-                    self.response(self.secretWord)
-
-                if not isCorrect and not is_guessed:
+                else:
+                    # proba nie zgadniecia litery ani calego slowa tylko jakies bzdury
+                    print('NOT EVEN CLOSE')
                     lives -= 1
-                    self.response("You have got {} lives, dont give up!".format(str(lives)))
-                    self.response(self.secretWord)
 
-                if '_' not in self.secretWord:
-                    self.response("You guessed the phrase {} correctly, congratulations ! You won !".format(word))
+                print(lives)
+                print('CHECK')
+                if lives <= 1 and not isCorrect:
+                    self.response( "Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word) )
                     time.sleep(1)
                     game = False
                     break
 
-            if lives < 1:
-                self.response("Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word))
-                time.sleep(1)
-                game = False
+                print(lives)
+                if isCorrect and not is_guessed:
+                    self.response( "Congrats, You guessed it !" )
+                    self.response(self.secretWord)
+
+                if not isCorrect and not is_guessed:
+                    lives -= 1
+                    self.response( "You have got {} lives, dont give up!".format(str(lives)) )
+                    self.response(self.secretWord)
+
+                if '_' not in self.secretWord:
+                    self.response( "You guessed the phrase {} correctly, congratulations ! You won !".format(word) )
+                    self.response("")
+                    time.sleep(1)
+                    game = False
+                    break
 
     def response(self, msg):
         bytesToSend = str.encode(msg)
