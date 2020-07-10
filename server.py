@@ -6,7 +6,7 @@ from settings import *
 class Server:
 
     def __init__(self):
-        self.sourceIP = "192.168.230.139"
+        self.sourceIP = "192.168.230.140"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -75,7 +75,7 @@ class Server:
             self.response( self.secretWord )
             time.sleep(1)
 
-            while(lives > 1):
+            while(lives >= 1):
                 # receiving letter from client
                 isCorrect = False
                 while(True):
@@ -95,13 +95,23 @@ class Server:
                 elif len(guess) == len(word):
                     if guess == word:
                         self.secretWord = word
+                        isCorrect = True
                         is_guessed = True
                     else:
                         lives -= 1
 
                 else:
                     # proba nie zgadniecia litery ani calego slowa tylko jakies bzdury
+                    print('NOT EVEN CLOSE')
                     lives -= 1
+
+                print(lives)
+                print('CHECK')
+                if lives <= 1 and not isCorrect:
+                    self.response( "Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word) )
+                    time.sleep(1)
+                    game = False
+                    break
 
                 print(lives)
                 if isCorrect and not is_guessed:
@@ -120,12 +130,6 @@ class Server:
                     game = False
                     break
             
-            if lives < 1:
-                self.response( "Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word) )
-                time.sleep(1)
-                game = False
-            
-            # mozna tu jeszcze dopisac opcje wybrania kolejnej gry lub wylaczenie ale to wiecej rzeczy bedzie do spradzania, wykonalne owszem, czy potrzebne nie wiem :/
 
     def response(self, msg):
         bytesToSend = str.encode(msg)

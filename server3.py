@@ -13,8 +13,8 @@ class Server:
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
         # multicast
-        #self.mcast_grp = '224.0.0.1'
-        self.mcast_grp = '224.3.29.71'
+        self.mcast_grp = '224.0.0.2'
+        #self.mcast_grp = '224.3.29.71'
         self.serverAddressMul = ('', 10000)
 
         print('lool')
@@ -156,6 +156,7 @@ class Server:
 
     def response(self, msg):
         bytesToSend = str.encode(msg)
+
         self.serverSocket.sendto(bytesToSend, self.cliAddress)
         time.sleep(1)
 

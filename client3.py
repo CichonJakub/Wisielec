@@ -14,7 +14,7 @@ if len(sys.argv) == 3:
     # UDPClientSocket.bind(('127.0.0.2', 8081))
     UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 else:
-    multicast_group = ('224.3.29.71', 10000)
+    multicast_group = ('224.0.0.2', 10000)
 
     
 
@@ -35,7 +35,7 @@ else:
     #serverAddressPort = ("127.0.0.2", 8080)
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
     print('hi')
-    UDPClientSocket.bind(('192.168.230.139', 5008))
+    #UDPClientSocket.bind(('192.168.230.139', 5008))
     infoFromServer = UDPClientSocket2.recvfrom(bufferSize)
     #infoFromServer = UDPClientSocket.recvfrom(bufferSize)
     print(infoFromServer[0])

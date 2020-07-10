@@ -110,7 +110,7 @@ class Server:
             #
             # except:
             #     print('Error when recieving multicast message')
-
+            print('hej')
 
 
             _thread.start_new_thread(self.uni(), )
@@ -128,11 +128,12 @@ class Server:
             #
             # except:
             #     print("Error when receiving message")
+            print('siema')
 
 
 
         while (game):
-
+            print('ccc')
             lives = 5
 
             clientMSG = "Message from Client: {}".format(message)

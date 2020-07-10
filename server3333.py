@@ -73,6 +73,7 @@ class Server:
                 #self.response("Hello my friendo !")
                 self.response2("Hello my friendo !", self.cliAddress)
                 print('wyslalem')
+                break
 
             except:
                 print('Error when recieving multicast message')
