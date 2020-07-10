@@ -8,6 +8,8 @@ import threading
 
 class Server:
 
+    values = []
+
     def __init__(self):
         self.sourceIP = "192.168.230.139"
         self.sourcePort = 8080
@@ -78,6 +80,19 @@ class Server:
             stop = True
             #break
 
+            global values
+
+            values.append(game)
+            values.append(message)
+            values.append(self.cliAddress)
+            values.append(category)
+            values.append(word)
+            values.append(guessed_letters)
+            values.append(is_guessed)
+            values.append(stop)
+
+            return values
+
         except:
             print("Error when receiving message")
 
@@ -129,6 +144,28 @@ class Server:
             # except:
             #     print("Error when receiving message")
             print('siema')
+            # values.append(game)
+            # values.append(message)
+            # values.append(self.cliAddress)
+            # values.append(category)
+            # values.append(word)
+            # values.append(guessed_letters)
+            # values.append(is_guessed)
+            # values.append(stop)
+
+            self.game = values[0]
+            self.message = values[1]
+            self.cliAddress = values[2]
+            self.categoty = values[3]
+            self.word = values[4]
+            self.guessed_letters = values[5]
+            self.is_guessed = values[6]
+            self.stop = values[7]
+
+            if self.stop == True:
+                break
+
+
 
 
 
@@ -136,24 +173,24 @@ class Server:
             print('ccc')
             lives = 5
 
-            clientMSG = "Message from Client: {}".format(message)
+            clientMSG = "Message from Client: {}".format(self.message)
             clientIP = "Client IP Address:{}".format(self.cliAddress)
 
             print(clientMSG)
             print(clientIP)
-            print(category)
-            print(word)
+            print(self.category)
+            print(self.word)
 
             self.secretWord = ''
 
             # zamienienie liter na '_ '
-            for letter in word:
+            for letter in self.word:
                 self.secretWord += '_ '
 
             self.response("WELCOME TO 'THE HANGMAN' GAME")
             time.sleep(1)
 
-            self.response("Phrase from category: {}".format(category))
+            self.response("Phrase from category: {}".format(self.category))
             time.sleep(1)
 
             self.response("Guess letter or entire phrase if You can ;)")
@@ -172,16 +209,16 @@ class Server:
                 guess = msgFromClient[0].decode()
                 print(guess)
 
-                if guess not in guessed_letters and len(guess) == 1:
-                    for loc, letter in enumerate(word):
+                if guess not in self.guessed_letters and len(guess) == 1:
+                    for loc, letter in enumerate(self.word):
                         if guess == letter:
                             isCorrect = True
                             self.secretWord = self.secretWord[:loc * 2] + guess + self.secretWord[loc * 2 + 1:]
-                    guessed_letters.append(guess)
+                    self.guessed_letters.append(guess)
 
-                if len(guess) == len(word):
-                    if guess == word:
-                        self.secretWord = word
+                if len(guess) == len(self.word):
+                    if guess == self.word:
+                        self.secretWord = self.word
                         is_guessed = True
 
                 # recv
@@ -196,13 +233,13 @@ class Server:
                     self.response(self.secretWord)
 
                 if '_' not in self.secretWord:
-                    self.response("You guessed the phrase {} correctly, congratulations ! You won !".format(word))
+                    self.response("You guessed the phrase {} correctly, congratulations ! You won !".format(self.word))
                     time.sleep(1)
                     game = False
                     break
 
             if lives < 1:
-                self.response("Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word))
+                self.response("Unfortunately You lost, the phrase was {}. Good luck next time :)".format(self.word))
                 time.sleep(1)
                 game = False
 
