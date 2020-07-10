@@ -42,7 +42,6 @@ else:
     print('sent')
 
 for i in range(5):
-    print('wait')
     msgFromServer = UDPClientSocket.recvfrom(bufferSize)
     msg = msgFromServer[0].decode()
     print(msg)

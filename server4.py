@@ -80,6 +80,11 @@ class Server:
 
         game = True
         print("LOOP")
+        # przejscie na unicast
+        bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
+        message = bytesAddressPair[0]
+        print(message)
+        self.cliAddress = bytesAddressPair[1]
         category, word = random.choice(list(wordBank.items()))
         guessed_letters = []
         is_guessed = False
