@@ -114,18 +114,19 @@ class Server:
                     time.sleep(2)
                     self.response2("Hello my friendo !", self.cliAddress)
                     #self.cliAddress = (self.cliAddress[0], 8080)
-                    print('wyslalem')                   
+                    print('wyslalem')
+                    # przejscie na unicast
+                    bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
+                    message = bytesAddressPair[0]
+                    print(message)
+                    self.cliAddress = bytesAddressPair[1]                   
                 except:
                     print('Error when recieving multicast message')
             break
 
         game = True
         print("LOOP")
-        # przejscie na unicast
-        bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
-        message = bytesAddressPair[0]
-        print(message)
-        self.cliAddress = bytesAddressPair[1]
+        
         category, word = random.choice(list(wordBank.items()))
         guessed_letters = []
         is_guessed = False

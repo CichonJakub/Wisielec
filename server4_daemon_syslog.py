@@ -50,7 +50,7 @@ class Server:
         sys.exit(1)
 
     def __init__(self):
-        self.sourceIP = "10.0.2.15"
+        self.sourceIP = "192.168.0.10"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -108,7 +108,7 @@ class Server:
                     #print('received unicast connection')
                     bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)                        
                     message = bytesAddressPair[0]
-                    syslog.syslog(message)
+                    syslog.syslog(str(message))
                     #print(message)
                     self.cliAddress = bytesAddressPair[1]                   
                 except:
@@ -127,7 +127,13 @@ class Server:
                     self.response2("Hello my friendo !", self.cliAddress)
                     #self.cliAddress = (self.cliAddress[0], 8080)
                     syslog.syslog("wyslalem")
-                    #print('wyslalem')                   
+                    #print('wyslalem')
+                    # przejscie na unicast
+                    bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
+                    message = bytesAddressPair[0]
+                    syslog.syslog(str(message))
+                    #print(message)
+                    self.cliAddress = bytesAddressPair[1]                   
                 except:
                     syslog.syslog("Error when recieving multicast message")
                     #print('Error when recieving multicast message')
@@ -136,12 +142,7 @@ class Server:
         game = True
         syslog.syslog("LOOP")
         #print("LOOP")
-        # przejscie na unicast
-        bytesAddressPair = self.serverSocket.recvfrom(self.bufferSize)
-        message = bytesAddressPair[0]
-        syslog.syslog(str(message))
-        #print(message)
-        self.cliAddress = bytesAddressPair[1]
+        
         category, word = random.choice(list(wordBank.items()))
         guessed_letters = []
         is_guessed = False
