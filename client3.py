@@ -1,6 +1,15 @@
 import sys
 import socket
 import struct
+import signal
+from settings import TIMEOUT
+
+def handler(signum, frame):
+    print ('Timeout called with signal alarm')
+    sys.exit(0)
+
+# Set the signal handler
+signal.signal(signal.SIGALRM, handler)
 
 msgFromClient = "Hello slave!"
 bytesToSend = str.encode(msgFromClient)
@@ -47,16 +56,20 @@ for i in range(5):
     print(msg)
 
 game = True
+timeout = False
 while (game):
 
+    signal.alarm(TIMEOUT)
     msg = input()
     bytesToSend = str.encode(msg)
     UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    signal.alarm(0)    
 
     for i in range(2):
         msgFromServer = UDPClientSocket.recvfrom(bufferSize)
         msg = msgFromServer[0].decode()
         print(msg)
+
         isFinished = msg.split()
         if isFinished[0] == "Unfortunately" or isFinished[0] == "Congratulations":
             game = False

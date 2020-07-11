@@ -6,3 +6,6 @@ wordBank = {
     'countries': 'spain',
     'movies': 'pulp fiction'
 }
+
+# in seconds
+TIMEOUT = 120

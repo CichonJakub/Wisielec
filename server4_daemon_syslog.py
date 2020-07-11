@@ -180,13 +180,20 @@ class Server:
             while(lives >= 1):
                 # receiving letter from client
                 isCorrect = False
-                while(True):
+                
+                try:
+                    self.serverSocket.settimeout(TIMEOUT)
                     msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
-                    if msgFromClient[1] == self.cliAddress:
-                        guess = msgFromClient[0].decode()
-                        syslog.syslog(str(guess))
-                        #print(guess)
-                        break
+                except socket.timeout:
+                    print("TIMEOUT REACH")
+                    game = False
+                    break
+                
+                print("XD")
+                if msgFromClient[1] == self.cliAddress:
+                    guess = msgFromClient[0].decode()
+                    syslog.syslog(str(guess))
+                    #print(guess)
 
                 if guess not in guessed_letters and len(guess) == 1:
                     for loc, letter in enumerate(word):
@@ -238,6 +245,7 @@ class Server:
                     # ending game
                     game = False
                     break
+            
         self.binding(self.serverAddress)
         self.play()
 
