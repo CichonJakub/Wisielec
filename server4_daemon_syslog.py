@@ -50,7 +50,7 @@ class Server:
         sys.exit(1)
 
     def __init__(self):
-        self.sourceIP = "192.168.0.10"
+        self.sourceIP = "192.168.230.140"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -216,6 +216,7 @@ class Server:
                 if lives <= 1 and not isCorrect:
                     self.response( "Unfortunately You lost, the phrase was {}. Good luck next time :)".format(word) )
                     time.sleep(1)
+                    # ending game
                     game = False
                     break
 
@@ -231,11 +232,14 @@ class Server:
                     self.response(self.secretWord)
 
                 if '_' not in self.secretWord:
-                    self.response( "You guessed the phrase {} correctly, congratulations ! You won !".format(word) )
+                    self.response( "Congratulations you guessed the phrase {} correctly ! You won !".format(word) )
                     self.response("")
                     time.sleep(1)
+                    # ending game
                     game = False
                     break
+        self.binding(self.serverAddress)
+        self.play()
 
     def response(self, msg):
         bytesToSend = str.encode(msg)

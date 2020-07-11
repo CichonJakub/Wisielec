@@ -46,7 +46,8 @@ for i in range(5):
     msg = msgFromServer[0].decode()
     print(msg)
 
-while (True):
+game = True
+while (game):
 
     msg = input()
     bytesToSend = str.encode(msg)
@@ -56,3 +57,7 @@ while (True):
         msgFromServer = UDPClientSocket.recvfrom(bufferSize)
         msg = msgFromServer[0].decode()
         print(msg)
+        isFinished = msg.split()
+        if isFinished[0] == "Unfortunately" or isFinished[0] == "Congratulations":
+            game = False
+            break
