@@ -50,7 +50,7 @@ class Server:
         sys.exit(1)
 
     def __init__(self):
-        self.sourceIP = "192.168.230.140"
+        self.sourceIP = "192.168.0.10"
         self.sourcePort = 8080
         self.serverAddress = (self.sourceIP, self.sourcePort)
         self.bufferSize = 1024
@@ -185,11 +185,12 @@ class Server:
                     self.serverSocket.settimeout(TIMEOUT)
                     msgFromClient = self.serverSocket.recvfrom(self.bufferSize)
                 except socket.timeout:
-                    print("TIMEOUT REACH")
+                    syslog.syslog("TIMEOUT REACH")
+                    #print("TIMEOUT REACH")
                     game = False
                     break
                 
-                print("XD")
+                
                 if msgFromClient[1] == self.cliAddress:
                     guess = msgFromClient[0].decode()
                     syslog.syslog(str(guess))
@@ -263,13 +264,7 @@ class Server:
 
 try:
     server = Server()
-    syslog.syslog("1")
-    #print('1')
     server.binding(server.serverAddress)
-    syslog.syslog("2")
-    #print('2')
     server.play()
-    syslog.syslog("3")
-    #print('3')
 except:
     print("sth goes wrong :/")

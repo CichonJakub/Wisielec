@@ -3,6 +3,7 @@ import socket
 import struct
 import signal
 from settings import TIMEOUT
+from IPy import IP
 
 def handler(signum, frame):
     print ('Timeout called with signal alarm')
@@ -18,7 +19,20 @@ bufferSize = 1024
 
 # argument 0 to jest nazawa pliku jaki odpalamy, uwaga: dane zaczynaja sie od argv[1]
 if len(sys.argv) == 3:
-    serverAddressPort = (str(sys.argv[1]), int(sys.argv[2]))
+    try:
+    	IP(sys.argv[1])
+    	ip_addr = sys.argv[1]
+    except ValueError:
+    	ip_addr = socket.gethostbyname(sys.argv[1])
+    
+    if(sys.argv[2].isdecimal()):
+    	port_number = sys.argv[2]
+    else:
+    	port_number = socket.getservbyname(sys.argv[2])
+    
+    #print(ip_addr)
+    #print(port_number)
+    serverAddressPort = (str(ip_addr), int(port_number))
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
     # UDPClientSocket.bind(('127.0.0.2', 8081))
     UDPClientSocket.sendto(bytesToSend, serverAddressPort)
@@ -28,16 +42,12 @@ else:
     
 
     UDPClientSocket2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_IP)
-    print('1')
     UDPClientSocket2.settimeout(5)
-    print('1.5')
     ttl = struct.pack('b', 1)
     UDPClientSocket2.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
-    print('1.75')
     
 
     UDPClientSocket2.sendto(bytesToSend, multicast_group)
-    print('2')
     
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
     print('hi')
