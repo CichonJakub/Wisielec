@@ -52,7 +52,7 @@ class Server:
         self.mcast_grp = '224.0.0.2'
         self.serverAddressMul = ('', 10000)
 
-        syslog.syslog("lool")
+        syslog.syslog("Creating sockets...")
 
         # create UDP socket
         self.uniSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
